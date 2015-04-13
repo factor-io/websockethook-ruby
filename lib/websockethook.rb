@@ -86,6 +86,7 @@ class WebSocketHook
           block.call type: 'error', message: "Message received, but couldn't parse: #{ex.message}"
         end
         content = data.inject({}) { |memo, (k, v)| memo[k.to_sym] = v; memo }
+        data[:data][:url] = "#{@host}#{data[:data][:path]}" if data[:type]=='registered' && data[:data] && data[:data][:path]
         block.call(content) if data && block
       end
 
