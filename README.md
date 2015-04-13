@@ -4,7 +4,7 @@
 [![Build Status](https://travis-ci.org/factor-io/websockethook-ruby.svg)](https://travis-ci.org/factor-io/websockethook-ruby)
 [![Gem Version](https://badge.fury.io/rb/websockethook.svg)](http://badge.fury.io/rb/websockethook)
 
-# WebSocketHook.io Ruby Library
+# Web.SocketHook.io Ruby Library
 
 
 ## Usage example
@@ -21,7 +21,7 @@ end
 
 ```
 
-**make call from shell*
+**make call from shell**
 ```shell
 > curl http://web.sockethook.io/hook/foo --data "foo=bar"
 ```
