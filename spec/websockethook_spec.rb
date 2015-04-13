@@ -27,6 +27,28 @@ describe WebSocketHook do
     t.kill
   end
 
+  it 'can open and close' do
+    ws = WebSocketHook.new
+    data = []
+    t = Thread.new { ws.listen { |msg| data << msg } }
+
+    eventually do
+      data.any? do |line|
+        line[:type] == 'open'
+      end
+    end
+
+    ws.stop
+
+    eventually do
+      data.any? do |line|
+        line[:type] == 'close'
+      end
+    end
+    
+    t.kill
+  end
+
   it 'can register a hook with an id' do
     id = "test_#{SecureRandom.hex(4)}"
     ws = WebSocketHook.new

@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    websockethook (0.1.01)
+    websockethook (0.1.02)
       faye-websocket (~> 0.9.2)
 
 GEM
