@@ -90,18 +90,10 @@ class WebSocketHook
         content = data.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo }
         block.call(content) if data && block
       end
-      ws.on :open do
-        block.call(type:'open') if block
-        @hooks.each {|hook| ws.send({type:'register', id:hook}.to_json) }
-      end
-      ws.on :close do
-        block.call(type:'close') if block
-        stop_em
-      end
-      ws.on :error do
-        block.call(type:'error') if block
-        stop_em
-      end
+
+      handle_ws(ws,:error, block) { @hooks.each {|hook| ws.send({type:'register', id:hook}.to_json) } }
+      handle_ws(ws,:close, block) { stop_em }
+      handle_ws(ws,:error, block) { stop_em }
     end
   end
 
@@ -117,5 +109,11 @@ class WebSocketHook
   rescue Interrupt
     stop
     callback_block.call(type:'stopped')
+  end
+
+  def handle_ws(ws, action, callback_block,&block)
+    ws.on action do
+      callback_block.call(type: action.to_s)
+    end
   end
 end
