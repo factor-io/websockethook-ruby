@@ -6,21 +6,38 @@ class WebSocketHook
   DEFAULT_HOST = 'ws://web.sockethook.io'
 
   def initialize(options = {})
-    @host       = options[:host] || DEFAULT_HOST
-    @pause      = options[:sleep] || 0.1
-    @stay_alive = options[:stay_alive] || true
-    @ping       = options[:ping] || 20
-    hooks       = options[:hooks] || []
-    @stopping   = false
-    @hooks      = []
+    @stopping = false
+    @hooks    = []
+    initialize_host options[:host]
+    initialize_pause options
+    initialize_keepalive options
+    initialize_ping options
+    initialize_hooks options
+  end
 
-    raise 'Host (:host) must be a URL' unless @host.is_a?(String)
+  def initialize_host(options = {})
+    @host = options[:host] || DEFAULT_HOST
+    raise 'Host (:host) must be a URL' unless options[:host].is_a?(String)
+  end
+
+  def initialize_pause(options = {})
+    @pause = options[:sleep] || 0.1
     raise 'Pause (:pause) must be a float or integer' unless @pause.is_a?(Float) || @pause.is_a?(Integer)
-    raise 'Stay Alive (:stay_alive) must be a boolean (true/false)' unless @stay_alive == true || @stay_alive == false
-    raise 'Ping (:ping) must be an integer' unless @ping.is_a?(Integer)
-    raise 'Stopping (:stopping) must be boolean (true/false)' unless @stopping == true || @stopping == false
-    raise 'Hooks (:hooks) must be an array' unless hooks.is_a?(Array)
+  end
 
+  def initialize_keep_alive(options = {})
+    @keep_alive = options[:keep_alive] || true
+    raise 'Keep Alive (:keep_alive) must be a boolean (true/false)' unless @keep_alive == true || @keep_alive == false
+  end
+
+  def initialize_ping(options = {})
+    @ping = options[:ping] || 20
+    raise 'Ping (:ping) must be an integer' unless @ping.is_a?(Integer)
+  end
+
+  def initialize_hooks(options = {})
+    hooks  = options[:hooks] || []
+    raise 'Hooks (:hooks) must be an array' unless hooks.is_a?(Array)
     hooks.each {|hook| register(hook) }
   end
 
@@ -39,7 +56,7 @@ class WebSocketHook
     begin
       @stopping = false
       listener(&block)
-      restart = @stay_alive && !@stopping
+      restart = @keep_alive && !@stopping
       if restart
         block.call type:'restart', message:'restarting connection since it was lost'
         sleep 5
