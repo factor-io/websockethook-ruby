@@ -78,6 +78,11 @@ class WebSocketHook
 
   def listener(&block)
     websocket(block) do |ws|
+      ws.on :open do
+        @hooks.each do |hook|
+          ws.send({type:'register',id:hook}.to_json)
+        end
+      end
       ws.on :message do |message|
         data = nil
         begin
