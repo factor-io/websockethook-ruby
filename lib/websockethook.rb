@@ -8,16 +8,16 @@ class WebSocketHook
   def initialize(options = {})
     @stopping = false
     @hooks    = []
-    initialize_host options[:host]
+    initialize_host options
     initialize_pause options
-    initialize_keepalive options
+    initialize_keep_alive options
     initialize_ping options
     initialize_hooks options
   end
 
   def initialize_host(options = {})
     @host = options[:host] || DEFAULT_HOST
-    raise 'Host (:host) must be a URL' unless options[:host].is_a?(String)
+    raise 'Host (:host) must be a URL' unless @host.is_a?(String)
   end
 
   def initialize_pause(options = {})
@@ -79,10 +79,7 @@ class WebSocketHook
   end
 
   def listener(&block)
-    EM.run do
-      ws_settings = {ping: @ping}
-      ws = Faye::WebSocket::Client.new(@host, nil, ws_settings)
-
+    websocket(block) do |ws|
       ws.on :message do |message|
         data = nil
         begin
@@ -93,29 +90,32 @@ class WebSocketHook
         content = data.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo }
         block.call(content) if data && block
       end
-
       ws.on :open do
         block.call(type:'open') if block
-        @hooks.each do |hook|
-          ws.send({type:'register', id:hook}.to_json)
-        end
+        @hooks.each {|hook| ws.send({type:'register', id:hook}.to_json) }
       end
-
       ws.on :close do
         block.call(type:'close') if block
         stop_em
       end
-
       ws.on :error do
         block.call(type:'error') if block
         stop_em
       end
     end
-    block.call(type:'stopped')
+  end
+
+  def websocket(callback_block, &socket_block)
+    EM.run do
+      ws_settings = {ping: @ping}
+      ws = Faye::WebSocket::Client.new(@host, nil, ws_settings)
+      socket_block.call(ws)
+    end
+    callback_block.call(type:'stopped')
   rescue => ex
-    block.call type:'error', message:ex.message
+    callback_block.call type:'error', message:ex.message
   rescue Interrupt
     stop
-    block.call(type:'stopped')
+    callback_block.call(type:'stopped')
   end
 end
