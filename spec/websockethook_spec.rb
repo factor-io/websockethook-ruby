@@ -3,10 +3,9 @@ require 'spec_helper'
 require 'websockethook'
 
 describe WebSocketHook do
-
   it 'can initialize' do
-    expect {
+    expect do
       ws = WebSocketHook.new
-      }.to_not raise_error
+    end.to_not raise_error
   end
 end

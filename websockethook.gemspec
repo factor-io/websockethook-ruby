@@ -11,9 +11,9 @@ Gem::Specification.new do |s|
   s.summary       = 'A library for use the free web.sockethook.io service'
   s.description   = 'Listen for web hooks in your app without creating a web service.'
   s.files         = Dir.glob('lib/**/*.rb')
-  s.license       = "MIT"
+  s.license       = 'MIT'
 
-  s.test_files    = Dir.glob("./{test,spec,features}/*.rb")
+  s.test_files    = Dir.glob('./{test,spec,features}/*.rb')
   s.require_paths = ['lib']
 
   s.add_runtime_dependency 'faye-websocket', '~> 0.9.2'
