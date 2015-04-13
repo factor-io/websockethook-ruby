@@ -15,32 +15,6 @@ class WebSocketHook
     initialize_hooks options
   end
 
-  def initialize_host(options = {})
-    @host = options[:host] || DEFAULT_HOST
-    fail 'Host (:host) must be a URL' unless @host.is_a?(String)
-  end
-
-  def initialize_pause(options = {})
-    @pause = options[:sleep] || 0.1
-    fail 'Pause (:pause) must be a float or integer' unless @pause.is_a?(Float) || @pause.is_a?(Integer)
-  end
-
-  def initialize_keep_alive(options = {})
-    @keep_alive = options[:keep_alive] || true
-    fail 'Keep Alive (:keep_alive) must be a boolean (true/false)' unless @keep_alive == true || @keep_alive == false
-  end
-
-  def initialize_ping(options = {})
-    @ping = options[:ping] || 20
-    fail 'Ping (:ping) must be an integer' unless @ping.is_a?(Integer)
-  end
-
-  def initialize_hooks(options = {})
-    hooks  = options[:hooks] || []
-    fail 'Hooks (:hooks) must be an array' unless hooks.is_a?(Array)
-    hooks.each { |hook| register(hook) }
-  end
-
   def register(id)
     fail "Hook id '#{id}' must be a String" unless id.is_a?(String)
     fail "Hook id must only be alphanumeric, '_', '.', or '_'" unless /^[a-zA-Z0-9\-_\.]*$/ === id
@@ -70,6 +44,32 @@ class WebSocketHook
   end
 
   private
+
+  def initialize_host(options = {})
+    @host = options[:host] || DEFAULT_HOST
+    fail 'Host (:host) must be a URL' unless @host.is_a?(String)
+  end
+
+  def initialize_pause(options = {})
+    @pause = options[:sleep] || 0.1
+    fail 'Pause (:pause) must be a float or integer' unless @pause.is_a?(Float) || @pause.is_a?(Integer)
+  end
+
+  def initialize_keep_alive(options = {})
+    @keep_alive = options[:keep_alive] || true
+    fail 'Keep Alive (:keep_alive) must be a boolean (true/false)' unless @keep_alive == true || @keep_alive == false
+  end
+
+  def initialize_ping(options = {})
+    @ping = options[:ping] || 20
+    fail 'Ping (:ping) must be an integer' unless @ping.is_a?(Integer)
+  end
+
+  def initialize_hooks(options = {})
+    hooks  = options[:hooks] || []
+    fail 'Hooks (:hooks) must be an array' unless hooks.is_a?(Array)
+    hooks.each { |hook| register(hook) }
+  end
 
   def stop_em
     EM.stop
