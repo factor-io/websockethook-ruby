@@ -16,9 +16,9 @@ Gem::Specification.new do |s|
   s.test_files    = Dir.glob("./{test,spec,features}/*.rb")
   s.require_paths = ['lib']
 
-  s.add_runtime_dependency 'faye-websocket', '~> 0.9', '>= 0.9.2'
+  s.add_runtime_dependency 'faye-websocket', '~> 0.9.2'
 
-  s.add_development_dependency 'rspec', '~> 3.2', '>= 3.2.0'
+  s.add_development_dependency 'rspec', '~> 3.2.0'
   s.add_development_dependency 'codeclimate-test-reporter', '~> 0.4.7'
-  s.add_development_dependency 'rake', '~> 10.4' ,'>= 10.4.2'
+  s.add_development_dependency 'rake', '~> 10.4.2'
 end
