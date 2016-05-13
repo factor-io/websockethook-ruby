@@ -4,7 +4,7 @@
 [![Build Status](https://travis-ci.org/factor-io/websockethook-ruby.svg)](https://travis-ci.org/factor-io/websockethook-ruby)
 [![Gem Version](https://badge.fury.io/rb/websockethook.svg)](http://badge.fury.io/rb/websockethook)
 
-# Web.SocketHook.io Ruby Library
+# WebSocketHook.io Ruby Library
 
 
 ## Usage example
@@ -13,9 +13,7 @@ require 'websockethook'
 
 wsh = WebSocketHook.new
 
-wsh.register 'foo'
-
-wsh.listen do |message|
+wsh.listen 'foo' do |message|
   puts "#{Time.now.to_s}: #{message}"
 end
 
@@ -23,5 +21,5 @@ end
 
 **make call from shell**
 ```shell
-> curl http://web.sockethook.io/hook/foo --data "foo=bar"
+> curl http://websockethook.io/hook/foo --data "foo=bar"
 ```
