@@ -3,33 +3,24 @@ require 'json'
 require 'eventmachine'
 
 class WebSocketHook
-  DEFAULT_HOST = 'ws://web.sockethook.io'
+  DEFAULT_HOST       = 'ws://websockethook.io'
+  DEFAULT_SLEEP      = 0.1
+  DEFAULT_KEEP_ALIVE = true
+  DEFAULT_PING       = 20
 
   def initialize(options = {})
     @stopping = false
-    @hooks    = []
     initialize_host options
     initialize_pause options
     initialize_keep_alive options
     initialize_ping options
-    initialize_hooks options
   end
 
-  def register(id)
-    fail "Hook id '#{id}' must be a String" unless id.is_a?(String)
-    fail "Hook id must only be alphanumeric, '_', '.', or '_'" unless /^[a-zA-Z0-9\-_\.]*$/ === id
-    @hooks << id unless @hooks.include?(id)
-  end
-
-  def unregister(id)
-    @hooks.delete(id)
-  end
-
-  def listen(&block)
+  def listen(id=nil, &block)
     fail 'Block must be provided' unless block && block.is_a?(Proc)
     begin
       @stopping = false
-      listener(&block)
+      listener(id, &block)
       restart = @keep_alive && !@stopping
       if restart
         block.call type: 'restart', message: 'restarting connection since it was lost'
@@ -51,24 +42,18 @@ class WebSocketHook
   end
 
   def initialize_pause(options = {})
-    @pause = options[:sleep] || 0.1
+    @pause = options[:sleep] || DEFAULT_SLEEP
     fail 'Pause (:pause) must be a float or integer' unless @pause.is_a?(Float) || @pause.is_a?(Integer)
   end
 
   def initialize_keep_alive(options = {})
-    @keep_alive = options[:keep_alive] || true
+    @keep_alive = options[:keep_alive] || DEFAULT_KEEP_ALIVE
     fail 'Keep Alive (:keep_alive) must be a boolean (true/false)' unless @keep_alive == true || @keep_alive == false
   end
 
   def initialize_ping(options = {})
-    @ping = options[:ping] || 20
+    @ping = options[:ping] || DEFAULT_PING
     fail 'Ping (:ping) must be an integer' unless @ping.is_a?(Integer)
-  end
-
-  def initialize_hooks(options = {})
-    hooks  = options[:hooks] || []
-    fail 'Hooks (:hooks) must be an array' unless hooks.is_a?(Array)
-    hooks.each { |hook| register(hook) }
   end
 
   def stop_em
@@ -76,13 +61,11 @@ class WebSocketHook
   rescue
   end
 
-  def listener(&block)
+  def listener(id, &block)
     websocket(block) do |ws|
       ws.on :open do
         block.call type: 'open'
-        @hooks.each do |hook|
-          ws.send({type:'register',id:hook}.to_json)
-        end
+        ws.send({type:'register',id:id}.to_json)
       end
       ws.on :message do |message|
         data = nil
