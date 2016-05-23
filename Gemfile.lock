@@ -1,5 +1,5 @@
 GIT
-  remote: git@github.com:skierkowski/websocket-client-simple.git
+  remote: http://github.com/skierkowski/websocket-client-simple
   revision: ee9db16d4422dd872fe02a03adf7caa2eb395ebf
   specs:
     websocket-client-simple (0.3.0)
@@ -9,7 +9,7 @@ GIT
 PATH
   remote: .
   specs:
-    websockethook (0.1.03)
+    websockethook (0.2.01)
 
 GEM
   remote: https://rubygems.org/

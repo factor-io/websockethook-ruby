@@ -3,4 +3,4 @@ source 'https://rubygems.org'
 gemspec
 
 
-gem 'websocket-client-simple', git: 'git@github.com:skierkowski/websocket-client-simple.git'
+gem 'websocket-client-simple', git: 'http://github.com/skierkowski/websocket-client-simple'
