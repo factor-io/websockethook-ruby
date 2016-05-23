@@ -10,49 +10,51 @@ describe WebSocketHook do
   end
 
   it 'can open and close' do
-    expect(@logger).to receive(:log).with({type: 'open'})
-    expect(@logger).to receive(:log).with({type: 'close'})
-    expect(@logger).to receive(:log).with({type: 'stopped'})
-
-    @ws.listen 'test' do |msg|
-      @logger.log(msg)
-      @ws.stop
-    end
-
-  end
-
-  it 'can trigger a hook with data' do
-    expect(@logger).to receive(:log).with({type: 'open'})
-    expect(@logger).to receive(:log).with({type: 'registered', data: anything()})
-    expect(@logger).to receive(:log).with({type: 'hook', id: anything(), data: {this_is_a:'test'}})
-    expect(@logger).to receive(:log).with({type: 'close'})
-    expect(@logger).to receive(:log).with({type: 'stopped'})
+    expect(@logger).to receive(:log).with(:open)
+    expect(@logger).to receive(:log).with(:closed)
+    expect(@logger).to receive(:log).with(:stopped)
 
     @ws.listen do |msg|
       @logger.log(msg)
+      @ws.stop
+    end
+  end
+
+  it 'can trigger a hook with data' do
+    expect(@logger).to receive(:log).with(:open,nil)
+    expect(@logger).to receive(:log).with(:registered, {'id'=>anything(),'path'=>anything()})
+    expect(@logger).to receive(:log).with(:hook, {'id'=> anything(), 'data' => {'this_is_a' => 'test'}})
+    expect(@logger).to receive(:log).with(:closed,nil)
+    expect(@logger).to receive(:log).with(:stopped,nil)
+
+    @ws.listen do |type,msg|
+      @logger.log(type,msg)
       
-      if msg[:type] == 'registered'
-        hook_url = msg[:data][:url]
-        RestClient.post(hook_url,this_is_a:'test')        
+      if type == :registered
+        host = @ws.host.sub(/^ws/,'http')
+        url = "#{host}#{msg['path']}"
+        RestClient.post(url,this_is_a:'test')        
       end
 
-      @ws.stop if msg[:type] == 'hook'
+      if type == :hook
+        @ws.stop 
+      end
     end    
   end
 
   it 'can register a custom id' do
     id = "test_#{SecureRandom.hex(4)}"
 
-    expect(@logger).to receive(:log).with({type: 'open'})
-    expect(@logger).to receive(:log).with({type: 'registered', data: anything()})
-    expect(@logger).to receive(:log).with({type: 'registered', data: {id:id, path:"/hook/#{id}",url:"http://websockethook.io/hook/#{id}"}})
-    expect(@logger).to receive(:log).with({type: 'close'})
-    expect(@logger).to receive(:log).with({type: 'stopped'})
+    expect(@logger).to receive(:log).with(:open, nil)
+    expect(@logger).to receive(:log).with(:registered, {'id'=>anything(),'path'=>anything()})
+    expect(@logger).to receive(:log).with(:registered, {'id'=>id, 'path'=>"/hook/#{id}"})
+    expect(@logger).to receive(:log).with(:closed, nil)
+    expect(@logger).to receive(:log).with(:stopped, nil)
 
-    @ws.listen id do |msg|
-      @logger.log(msg)
+    @ws.listen id do |type,msg|
+      @logger.log(type,msg)
       
-      if msg[:type] == 'registered' && msg[:data][:id] == id
+      if type == :registered && msg['id'] == id
         @ws.stop
       end
     end    
