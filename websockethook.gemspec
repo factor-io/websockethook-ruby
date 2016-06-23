@@ -3,7 +3,7 @@ $LOAD_PATH.push File.expand_path('../lib', __FILE__)
 
 Gem::Specification.new do |s|
   s.name          = 'websockethook'
-  s.version       = '0.2.01'
+  s.version       = '0.2.02'
   s.platform      = Gem::Platform::RUBY
   s.authors       = ['Maciej Skierkowski']
   s.email         = ['maciej@factor.io']
@@ -16,8 +16,10 @@ Gem::Specification.new do |s|
   s.test_files    = Dir.glob('./{test,spec,features}/*.rb')
   s.require_paths = ['lib']
 
+  s.add_runtime_dependency 'websocket-client-simple', '~> 0.3.0'
+
   s.add_development_dependency 'rspec', '~> 3.4.0'
-  s.add_development_dependency 'codeclimate-test-reporter', '~> 0.5.0'
-  s.add_development_dependency 'rake', '~> 11.1.2'
+  s.add_development_dependency 'codeclimate-test-reporter', '~> 0.5.2'
+  s.add_development_dependency 'rake', '~> 11.2.2'
   s.add_development_dependency 'rest-client', '~> 1.8.0'
 end

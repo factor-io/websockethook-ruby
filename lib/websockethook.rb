@@ -12,7 +12,6 @@ class WebSocketHook
   def initialize(options = {})
     @stopping = false
     initialize_host options
-    # initialize_keep_alive options
   end
 
   def listen(id=nil, &callback)
@@ -44,7 +43,7 @@ class WebSocketHook
           callback.call :registered, data['data']
         end
         callback.call :hook, {'id'=>data['id'], 'data' => data['data']} if data['type'] == 'hook'
-      end
+    end
   end
 
   def block(&callback)
